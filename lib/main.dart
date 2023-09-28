@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zatca_invoice_reader/results_page.dart';
 import 'package:zatca_invoice_reader/scanner_page.dart';
 
 void main() {
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'ZATCA Invoice Reader'),
       routes: {
         ScannerPage.id: (context) => const ScannerPage(),
+        ResultsPage.id: (context) => const ResultsPage(),
       },
     );
   }

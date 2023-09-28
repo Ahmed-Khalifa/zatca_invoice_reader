@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:ui';
 import 'package:string_validator/string_validator.dart';
 import 'package:flutter/foundation.dart';
@@ -32,46 +33,19 @@ class _ScannerPageState extends State<ScannerPage> {
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
               final Uint8List? image = capture.image;
+              List<TLV> tlvList = [];
               for (final barcode in barcodes) {
                 String base64String = barcode.rawValue!;
                 debugPrint('Base64 String: ${base64Decode(base64String)}');
-                // String hexData = base64ToHex(base64String); //Hex String
-                // debugPrint(hexData);
-                // List hexList = base64ToHexList(hexData);
-                // debugPrint(hexList.toString());
-
-                // hexData.split(pattern);
-                // Uint8List.fromList(elements);
-
                 Uint8List bytes = base64Decode(base64String);
                 debugPrint(bytes.toString());
-                List<TLV> tlvList = TlvUtils.decode(bytes);
+                tlvList = TlvUtils.decode(bytes);
                 debugPrint(tlvList.length.toString());
-                // TlvUtils.decode()
-
-                for (var tlv in tlvList) {
-                  debugPrint(
-                      'TLV: ${isBase64(tlv.value.toString()).toString()}');
-                  if (isBase64(tlv.value.toString())) {
-                    Base64Decoder decoder = const Base64Decoder();
-                    Uint8List newBytes = decoder.convert(tlv.value.toString());
-                    List<TLV> newTlvList = TlvUtils.decode(newBytes);
-                    for (var newTlv in newTlvList) {
-                      Utf8Decoder utf8Decoder = const Utf8Decoder();
-                      // debugPrint(utf8Decoder.convert(newTlv.value));
-                    }
-                    // tlvList.add(decoder.convert(base64String)) =
-                    //     TlvUtils.decode(bytes).addAll(iterable);
-                    // Utf8Decoder utf8Decoder = const Utf8Decoder();
-                    // debugPrint(utf8Decoder.convert(tlv.value));
-                  } else {
-                    Utf8Decoder utf8Decoder = const Utf8Decoder();
-                    // debugPrint(utf8Decoder.convert(tlv.value));
-                  }
-                }
               }
               cameraController.dispose();
-              Navigator.popAndPushNamed(context, ResultsPage.id);
+              Navigator.popAndPushNamed(context, ResultsPage.id, arguments: {
+                'tlv_list': tlvList,
+              });
             },
           ),
         ),
@@ -137,18 +111,5 @@ class _ScannerPageState extends State<ScannerPage> {
         ),
       ],
     ));
-  }
-
-  String base64ToHex(String source) =>
-      base64Decode(LineSplitter.split(source).join())
-          .map((e) => e.toRadixString(16).padLeft(2, '0'))
-          .join();
-
-  List<String> base64ToHexList(String source) {
-    List<String> splittedSource = [];
-    for (var i = 0; i < source.length - 1; i += 2) {
-      splittedSource.add('${source[i]}${source[i + 1]}');
-    }
-    return splittedSource;
   }
 }
