@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'ZATCA Invoice Reader'),
       routes: {
         ScannerPage.id: (context) => const ScannerPage(),
-        ResultsPage.id: (context) => const ResultsPage(),
+        ResultsPage.id: (context) => const ResultsPage([]),
       },
     );
   }
